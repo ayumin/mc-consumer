@@ -11,6 +11,7 @@ $(window).ready(function() {
   var temp_data = d3.range(28).map(historical_data)
   var temp_t    = 28;
   var temp_chart = chart("#tempchart", temp_data);
+  var last_battery = 0;
 
   var socket = io.connect('http://device-mothership.herokuapp.com:80/');
 
@@ -26,6 +27,17 @@ $(window).ready(function() {
     set_temp(readings.temp);
   });
 
+  $('#broadcast').on('click', function() {
+    var opts = {
+      temp: $('#device .temp').text(),
+      battery: last_battery
+    };
+    $.post('/broadcast', opts, function(data, status) {
+      console.log('data', data);
+      console.log('status', status);
+    });
+  });
+
   function set_temp(val) {
     $('#device .temp').text(val);
     temp_data.shift();
@@ -35,6 +47,8 @@ $(window).ready(function() {
   }
 
   function set_battery(pct) {
+    last_battery = pct;
+
     $('#battery-level').css('width', pct + '%');
 
     $('#battery').removeClass('progress-success');

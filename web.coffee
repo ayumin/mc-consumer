@@ -2,9 +2,11 @@ async    = require("async")
 coffee   = require("coffee-script")
 express  = require("express")
 http     = require("http")
+https    = require("https")
 log      = require("./lib/logger").init("device.consumer")
 merge    = require("coffee-script").helpers.merge
 passport = require("passport")
+qs       = require("querystring")
 
 delay = (ms, cb) -> setTimeout  cb, ms
 every = (ms, cb) -> setInterval cb, ms
@@ -19,7 +21,8 @@ post = (url, data, cb) ->
   headers =
     "Content-Length": data.length
     "Content-Type": "application/x-www-form-urlencoded"
-  req = http.request merge(require("url").parse(url), method:"POST", headers:headers), (res) ->
+  proto = require(require("url").parse(url).protocol.slice(0,-1))
+  req = proto.request merge(require("url").parse(url), method:"POST", headers:headers), (res) ->
     buffer = ""
     res.on "data", (data) -> buffer += data.toString()
     res.on "end", -> cb null, buffer
@@ -44,6 +47,7 @@ passport.use new FacebookStrategy
   clientSecret: process.env.FACEBOOK_SECRET
   callbackURL:  process.env.FACEBOOK_CALLBACK_URL
   (access, refresh, profile, done) ->
+    profile.access = access
     done null, profile
 
 passport.serializeUser (user, done)  -> console.log "uuuser", user; done null, user
@@ -106,18 +110,14 @@ app.post "/device", ensure_authenticated, (req, res) ->
   post "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
     res.redirect "/dashboard"
 
-app.get "/devices", ensure_authenticated, (req, res) ->
-  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/devices", (err, data) ->
-    res.render "devices.jade", user:req.user, devices:JSON.parse(data)
-
-app.post "/devices", ensure_authenticated, (req, res) ->
-  post "http://device-mothership.herokuapp.com/user/#{req.user.id}/devices", "device=#{req.body.device}", (err, data) ->
-    res.redirect "/devices"
-
-app.get "/device/:id", (req, res) ->
-  req.facebook.get "/friends", limit:4, (err, friends) ->
-    console.log "err", err
-    console.log "friends", friends
-    res.render "index.ejs", host:req.headers.host, facebook:req.facebook, app:app
+app.post "/broadcast", ensure_authenticated, (req, res) ->
+  console.log "user", req.user
+  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+    device = JSON.parse(data)
+    message = "Current Temperature: #{req.body.temp}°C\nBattery Level: #{req.body.battery}%"
+    post "https://graph.facebook.com/me/feed", qs.stringify(message:message, access_token:req.user.access), (err, data) ->
+      console.log "err", err
+      console.log "data", data
+      res.redirect "/dashboard"
 
 app.listen (process.env.PORT || 5000)

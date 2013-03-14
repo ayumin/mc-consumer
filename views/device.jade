@@ -6,7 +6,8 @@ script(src="/device.js")
   #device(data-id=device)
     .row
       .current.span6
-        h3 Current
+        h3
+          = "Current"
         .temperature
           .temp
           .units &deg;C
@@ -14,6 +15,7 @@ script(src="/device.js")
           h5 Battery Level
           .progress#battery
             .bar#battery-level(style="width:0%;")
+          a.pull-right.btn.btn-primary#broadcast Post to Facebook
       .history.span6
         h3 History
         #tempchart
