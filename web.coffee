@@ -120,4 +120,9 @@ app.post "/broadcast", ensure_authenticated, (req, res) ->
       console.log "data", data
       res.redirect "/dashboard"
 
-app.listen (process.env.PORT || 5000)
+
+server = http.createServer(app)
+
+require("socket.io").listen(server)
+
+server.listen (process.env.PORT || 5000)
