@@ -9,6 +9,7 @@ body {
 
 .current .temperature {
   float: left;
+  margin-top: 12px;
 }
 
 .current .temperature .temp {
@@ -28,7 +29,7 @@ body {
 .current .battery {
   float: right;
   width: 300px;
-  margin-top: -6px;
+  margin-top: 4px;
 }
 
 .current .battery h5 {
