@@ -3,7 +3,6 @@ $(window).ready(function() {
   var socket = io.connect('http://device-mothership.herokuapp.com:80/');
 
   socket.on('connect', function() {
-    console.log('connected', $('#device').data('id'));
     socket.emit('listen-device', $('#device').data('id'));
   });
 
