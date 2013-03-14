@@ -3,6 +3,10 @@ body {
   padding-bottom: 40px;
 }
 
+h1.example {
+  margin-top: -10px;
+}
+
 #device h3 {
   border-bottom: 1px #999 solid;
 }
@@ -39,4 +43,8 @@ body {
 
 #tempchart rect {
   background-color: #ccc;
+}
+
+ul#history {
+  display: none;
 }

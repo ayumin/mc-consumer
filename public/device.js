@@ -1,11 +1,15 @@
 $(window).ready(function() {
 
-  function bootstrap(){
-    return {time: 0, value: 0};
+  var h_data = $('#history .temp li')
+
+  function historical_data(i) {
+    var value = parseInt($(h_data[h_data.length - i - 1]).text());
+    if (isNaN(value)) { value = 0; }
+    return {time:i, value:value};
   }
 
-  var temp_data = d3.range(28).map(bootstrap)
-  var temp_t    = 0;
+  var temp_data = d3.range(28).map(historical_data)
+  var temp_t    = 28;
   var temp_chart = chart("#tempchart", temp_data);
 
   var socket = io.connect('http://device-mothership.herokuapp.com:80/');
@@ -14,29 +18,37 @@ $(window).ready(function() {
     socket.emit('listen-device', $('#device').data('id'));
   });
 
+  set_temp(temp_data[temp_data.length-1].value);
+  set_battery($('#history .battery li:last').text());
+
   socket.on('readings', function(readings) {
-    $('#device .temp').text(readings.temp);
+    set_battery(readings.battery);
+    set_temp(readings.temp);
+  });
 
-    $('#battery-level').css('width', readings.battery + '%');
-
-    //update temperature data chart
+  function set_temp(val) {
+    $('#device .temp').text(val);
     temp_data.shift();
-    var new_data = {time: temp_t+=1, value: readings.temp};
+    var new_data = {time: temp_t+=1, value: val};
     temp_data.push(new_data);
     temp_chart.redraw(temp_data);
+  }
+
+  function set_battery(pct) {
+    $('#battery-level').css('width', pct + '%');
 
     $('#battery').removeClass('progress-success');
     $('#battery').removeClass('progress-warning');
     $('#battery').removeClass('progress-danger');
 
-    if (readings.battery > 30) {
+    if (pct > 30) {
       $('#battery').addClass('progress-success');
-    } else if (readings.battery > 10) {
+    } else if (pct > 10) {
       $('#battery').addClass('progress-warning');
     } else {
       $('#battery').addClass('progress-danger');
     }
-  });
+  }
 });
 
 function chart(selector, data) {
@@ -89,8 +101,11 @@ function chart(selector, data) {
         .duration(1000)
         .attr("x", function(d, i) { return x(i) - .5; });
 
-    rect.exit().remove();
-
+    rect.exit()
+      .transition()
+        .duration(1000)
+        .attr("x", function(d, i) { return y(i) + .5; })
+      .remove();
   }
 
   return chart;

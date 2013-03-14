@@ -17,3 +17,11 @@ script(src="/device.js")
       .history.span6
         h3 History
         #tempchart
+
+ul#history
+  .temp
+    each item in history.temp
+      li= item
+  .battery
+    each item in history.battery
+      li= item

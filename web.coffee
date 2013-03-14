@@ -83,7 +83,7 @@ app.get "/auth/facebook/callback", authenticate(), (req, res) ->
   res.redirect "/dashboard"
 
 app.get "/", (req, res) ->
-  res.render "index.jade"
+  res.render "index.jade", user:{}
 
 app.get "/reset", ensure_authenticated, (req, res) ->
   del "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "", (err, data) ->
@@ -93,10 +93,12 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
   get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
     if device
-      # get "http://device-mothership.herokuapp.com/device/#{device}/history", (err, data) ->
-      #   history = JSON.parse(data)
-      history = [{time:"1363286793254",battery:"50",temp:"30"}]
-      res.render "device.jade", user:req.user, device:device, history:history
+      get "http://device-mothership.herokuapp.com/sensor/#{device}/history/hour", (err, data) ->
+        try
+          history = JSON.parse(data)
+        catch error
+          history = {temp:[], battery:[]}
+        res.render "device.jade", user:req.user, device:device, history:history
     else
       res.render "welcome.jade", user:req.user, device:device
 
