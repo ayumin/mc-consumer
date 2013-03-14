@@ -1,11 +1,48 @@
-async     = require("async")
-coffee    = require("coffee-script")
-express   = require("express")
-faceplate = require("faceplate")
-log       = require("./lib/logger").init("device.consumer")
+async    = require("async")
+coffee   = require("coffee-script")
+express  = require("express")
+http     = require("http")
+merge    = require("coffee-script").helpers.merge
+passport = require("passport")
+log      = require("./lib/logger").init("device.consumer")
 
 delay = (ms, cb) -> setTimeout  cb, ms
 every = (ms, cb) -> setInterval cb, ms
+
+get = (url, cb) ->
+  http.get url, (res) ->
+    buffer = ""
+    res.on "data", (data) -> buffer += data.toString()
+    res.on "end", -> cb null, buffer
+
+post = (url, data, cb) ->
+  headers =
+    "Content-Length": data.length
+    "Content-Type": "application/x-www-form-urlencoded"
+  req = http.request merge(require("url").parse(url), method:"POST", headers:headers), (res) ->
+    buffer = ""
+    res.on "data", (data) -> buffer += data.toString()
+    res.on "end", -> cb null, buffer
+  req.write data
+  req.end()
+
+FacebookStrategy = require("passport-facebook").Strategy
+
+passport.use new FacebookStrategy
+  clientID:     process.env.FACEBOOK_APP_ID
+  clientSecret: process.env.FACEBOOK_SECRET
+  callbackURL:  process.env.FACEBOOK_CALLBACK_URL
+  (access, refresh, profile, done) ->
+    done null, profile
+
+passport.serializeUser (user, done)  -> console.log "uuuser", user; done null, user
+passport.deserializeUser (obj, done) -> done null, obj
+
+authenticate = () ->
+  passport.authenticate "facebook", scope:["publish_actions"], failureRedirect:"/auth/invalid"
+
+ensure_authenticated = (req, res, next) ->
+  if req.isAuthenticated() then next() else res.redirect "/auth/facebook"
 
 express.logger.format "method",     (req, res) -> req.method.toLowerCase()
 express.logger.format "url",        (req, res) -> req.url.replace('"', "&quot")
@@ -21,13 +58,29 @@ app.use express.logger
 app.use express.cookieParser()
 app.use express.bodyParser()
 app.use express.session({ secret:process.env.SESSION_SECRET || "secret123" })
-app.use faceplate.middleware
-  app_id: process.env.FACEBOOK_APP_ID
-  secret: process.env.FACEBOOK_SECRET
-  scope:  "user_likes,user_ohotos,user_photo_video_tags"
+app.use passport.initialize()
+app.use passport.session()
+app.use express.static("#{__dirname}/public")
+app.use app.router
 
-app.post "/", (req, res) ->
-  res.redirect "/device/1"
+app.get "/auth/invalid", (req, res) ->
+  res.send "invalid login"
+
+app.get "/auth/facebook", authenticate()
+
+app.get "/auth/facebook/callback", authenticate(), (req, res) ->
+  res.redirect "/devices"
+
+app.get "/", (req, res) ->
+  res.render "index.jade"
+
+app.get "/devices", ensure_authenticated, (req, res) ->
+  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/devices", (err, data) ->
+    res.render "devices.jade", user:req.user, devices:JSON.parse(data)
+
+app.post "/devices", ensure_authenticated, (req, res) ->
+  post "http://device-mothership.herokuapp.com/user/#{req.user.id}/devices", "device=#{req.body.device}", (err, data) ->
+    res.redirect "/devices"
 
 app.get "/device/:id", (req, res) ->
   req.facebook.get "/friends", limit:4, (err, friends) ->

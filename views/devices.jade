@@ -1,0 +1,21 @@
+h1 Panasonic Consumer Application Demo
+h2= user.displayName
+
+h3 Devices
+
+form(method="post", action="/devices")
+  table
+    thead
+      th Serial
+      th Temperature
+      th Battery
+    tfoot
+      td
+        input(name="device", type="text", size="30")
+      td
+        input(type="submit", value="Add New")
+    each device in devices
+      tr
+        td= device
+        td
+        td
