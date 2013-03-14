@@ -1,0 +1,19 @@
+include _header
+
+script(src="/device.js")
+  
+.container
+  #device(data-id=device)
+    .row
+      .current.span6
+        h3 Current
+        .temperature
+          .temp
+          .units &deg;C
+        .battery
+          h5 Battery Level
+          .progress#battery
+            .bar#battery-level(style="width:0%;")
+      .history.span6
+        h3 History
+        #tempchart

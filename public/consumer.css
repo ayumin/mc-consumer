@@ -36,3 +36,7 @@ body {
   text-align: right;
   font-size: 1.2em;
 }
+
+#tempchart rect {
+  background-color: #ccc;
+}

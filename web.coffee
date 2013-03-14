@@ -92,8 +92,13 @@ app.get "/reset", ensure_authenticated, (req, res) ->
 app.get "/dashboard", ensure_authenticated, (req, res) ->
   get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
-    console.log "device", device
-    res.render "dashboard.jade", user:req.user, device:device
+    if device
+      # get "http://device-mothership.herokuapp.com/device/#{device}/history", (err, data) ->
+      #   history = JSON.parse(data)
+      history = [{time:"1363286793254",battery:"50",temp:"30"}]
+      res.render "device.jade", user:req.user, device:device, history:history
+    else
+      res.render "welcome.jade", user:req.user, device:device
 
 app.post "/device", ensure_authenticated, (req, res) ->
   post "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
