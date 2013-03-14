@@ -1,4 +1,20 @@
-h1 Panasonic Consumer Application Demo
+doctype 5
+html
+  head
+    link(rel="stylesheet", href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css")
+    link(rel="stylesheet", href="/consumer.css")
+    script(src="/jquery.js")
+    script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js")
+    script(src="http://device-mothership.herokuapp.com/socket.io/socket.io.js")
+  body
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.brand Device Consumer
 
-a(href="/auth/facebook")
-  img(src="/facebook_login.png")
+    .container
+      h1 Panasonic Consumer Application Demo
+
+      .hero-unit(style="text-align:center")
+        a(href="/auth/facebook")
+          img(src="/facebook_login.png")
