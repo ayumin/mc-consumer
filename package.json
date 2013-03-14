@@ -3,13 +3,15 @@
   "version": "0.0.1",
 
   "dependencies": {
-    "async":         "0.2.x",
-    "coffee-script": "1.2.x",
-    "ejs":           "0.8.x",
-    "express":       "3.0.x",
-    "faceplate":     "0.5.x",
-    "nodemon":       "0.7.x",
-    "node-uuid":     "1.4.x"
+    "async":             "0.2.x",
+    "coffee-script":     "1.2.x",
+    "ejs":               "0.8.x",
+    "express":           "3.0.x",
+    "jade":              "0.28.x",
+    "nodemon":           "0.7.x",
+    "node-uuid":         "1.4.x",
+    "passport":          "0.1.x",
+    "passport-facebook": "0.1.x"
   },
 
   "engines": {
