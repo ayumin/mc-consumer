@@ -104,8 +104,7 @@ function chart(selector, data) {
     rect.exit()
       .transition()
         .duration(1000)
-        .attr("x", function(d, i) { return y(i) + .5; })
-      .remove();
+        .remove();
   }
 
   return chart;
