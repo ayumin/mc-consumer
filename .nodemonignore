@@ -1,3 +1,5 @@
 .git
+*.css
+*.jade
+*.js
 *.swp
-/*.tgz

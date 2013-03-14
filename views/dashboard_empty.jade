@@ -1,0 +1,8 @@
+.hero-unit
+  h1 Welcome to the future!
+  p To get started, please enter the serial number of your device below:
+  p
+    form.form-inline(method="post", action="/device")
+      input.input-xxlarge(type="text", name="device")
+      &nbsp;&nbsp;
+      input.btn.btn-primary(type="submit", value="Register Device")

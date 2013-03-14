@@ -2,9 +2,9 @@ async    = require("async")
 coffee   = require("coffee-script")
 express  = require("express")
 http     = require("http")
+log      = require("./lib/logger").init("device.consumer")
 merge    = require("coffee-script").helpers.merge
 passport = require("passport")
-log      = require("./lib/logger").init("device.consumer")
 
 delay = (ms, cb) -> setTimeout  cb, ms
 every = (ms, cb) -> setInterval cb, ms
@@ -20,6 +20,17 @@ post = (url, data, cb) ->
     "Content-Length": data.length
     "Content-Type": "application/x-www-form-urlencoded"
   req = http.request merge(require("url").parse(url), method:"POST", headers:headers), (res) ->
+    buffer = ""
+    res.on "data", (data) -> buffer += data.toString()
+    res.on "end", -> cb null, buffer
+  req.write data
+  req.end()
+
+del = (url, data, cb) ->
+  headers =
+    "Content-Length": data.length
+    "Content-Type": "application/x-www-form-urlencoded"
+  req = http.request merge(require("url").parse(url), method:"DELETE", headers:headers), (res) ->
     buffer = ""
     res.on "data", (data) -> buffer += data.toString()
     res.on "end", -> cb null, buffer
@@ -69,10 +80,24 @@ app.get "/auth/invalid", (req, res) ->
 app.get "/auth/facebook", authenticate()
 
 app.get "/auth/facebook/callback", authenticate(), (req, res) ->
-  res.redirect "/devices"
+  res.redirect "/dashboard"
 
 app.get "/", (req, res) ->
   res.render "index.jade"
+
+app.get "/reset", ensure_authenticated, (req, res) ->
+  del "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "", (err, data) ->
+    res.redirect "/dashboard"
+
+app.get "/dashboard", ensure_authenticated, (req, res) ->
+  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+    device = JSON.parse(data)
+    console.log "device", device
+    res.render "dashboard.jade", user:req.user, device:device
+
+app.post "/device", ensure_authenticated, (req, res) ->
+  post "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
+    res.redirect "/dashboard"
 
 app.get "/devices", ensure_authenticated, (req, res) ->
   get "http://device-mothership.herokuapp.com/user/#{req.user.id}/devices", (err, data) ->
