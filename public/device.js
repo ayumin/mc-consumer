@@ -38,6 +38,14 @@ $(window).ready(function() {
     });
   });
 
+  $('#set-temperature').on('click', function() {
+    if ((temp = $('#set-temperature-to').val().replace(/\s/, '')) != '') {
+      $.get('http://device-mothership.herokuapp.com/sensor/' + $('#device').data('id') + '/set/temp/' + temp, function(a,b,c) {
+        $('#set-temperature-to').val('');
+      });
+    }
+  });
+
   function set_temp(val) {
     $('#device .temp').text(val);
     temp_data.shift();

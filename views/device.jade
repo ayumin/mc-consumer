@@ -8,14 +8,21 @@ script(src="/device.js")
       .current.span6
         h3
           = "Current"
-        .temperature
-          .temp
-          .units &deg;C
-        .battery
-          h5 Battery Level
-          .progress#battery
-            .bar#battery-level(style="width:0%;")
-          a.pull-right.btn.btn-primary#broadcast Post to Facebook
+        .row
+          .temperature
+            .clearfix
+              .temp
+              .units &deg;C
+          .battery
+            h5 Battery Level
+            .progress#battery
+              .bar#battery-level(style="width:0%;")
+            a.pull-right.btn.btn-primary#broadcast Post to Facebook
+        .row
+          #control.form-inline
+            input.input-mini#set-temperature-to(type="text", name="temp")
+            &nbsp;&nbsp;
+            input.btn.btn-primary#set-temperature(type="submit", value="Set")
       .history.span6
         h3 History
         #tempchart

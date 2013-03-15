@@ -41,10 +41,19 @@ h1.example {
   font-size: 1.2em;
 }
 
+.current .row {
+  margin-left: 0px;
+}
+
 #tempchart rect {
   background-color: #ccc;
 }
 
 ul#history {
   display: none;
+}
+
+#control {
+  margin-top: 12px;
+  margin-left: 6px;
 }

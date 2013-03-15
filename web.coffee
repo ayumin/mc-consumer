@@ -50,7 +50,7 @@ passport.use new FacebookStrategy
     profile.access = access
     done null, profile
 
-passport.serializeUser (user, done)  -> console.log "uuuser", user; done null, user
+passport.serializeUser (user, done)  -> done null, user
 passport.deserializeUser (obj, done) -> done null, obj
 
 authenticate = () ->
@@ -102,6 +102,7 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
           history = JSON.parse(data)
         catch error
           history = {temp:[], battery:[]}
+        console.log "history", history
         res.render "device.jade", user:req.user, device:device, history:history
     else
       res.render "welcome.jade", user:req.user, device:device
