@@ -8,7 +8,8 @@ script(src="/device.js")
       .current.span6
         h3
           = "Current"
-        .row
+            a.pull-right.btn.btn-small.btn-primary#broadcast Post to Facebook
+        .row.clearfix
           .temperature
             .clearfix
               .temp
@@ -17,7 +18,6 @@ script(src="/device.js")
             h5 Battery Level
             .progress#battery
               .bar#battery-level(style="width:0%;")
-            a.pull-right.btn.btn-primary#broadcast Post to Facebook
         .row
           #control.form-inline
             input.input-mini#set-temperature-to(type="text", name="temp")

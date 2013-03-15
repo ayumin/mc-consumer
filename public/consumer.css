@@ -54,6 +54,10 @@ ul#history {
 }
 
 #control {
-  margin-top: 12px;
-  margin-left: 6px;
+  margin-top: 38px;
+  margin-left: 4px;
+}
+
+#broadcast {
+  margin-top: 6px;
 }
