@@ -90,14 +90,14 @@ app.get "/", (req, res) ->
   res.render "index.jade", user:{}
 
 app.get "/reset", ensure_authenticated, (req, res) ->
-  del "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "", (err, data) ->
+  del "http://mc-control.herokuapp.com/user/#{req.user.id}/device", "", (err, data) ->
     res.redirect "/dashboard"
 
 app.get "/dashboard", ensure_authenticated, (req, res) ->
-  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+  get "http://mc-control.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
     if device
-      get "http://device-mothership.herokuapp.com/sensor/#{device}/history/hour", (err, data) ->
+      get "http://mc-control.herokuapp.com/sensor/#{device}/history/hour", (err, data) ->
         try
           history = JSON.parse(data)
         catch error
@@ -108,12 +108,12 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
       res.render "welcome.jade", user:req.user, device:device
 
 app.post "/device", ensure_authenticated, (req, res) ->
-  post "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
+  post "http://mc-control.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
     res.redirect "/dashboard"
 
 app.post "/broadcast", ensure_authenticated, (req, res) ->
   console.log "user", req.user
-  get "http://device-mothership.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+  get "http://mc-control.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
     message = "Current Temperature: #{req.body.temp}°C\nBattery Level: #{req.body.battery}%"
     post "https://graph.facebook.com/me/feed", qs.stringify(message:message, access_token:req.user.access), (err, data) ->

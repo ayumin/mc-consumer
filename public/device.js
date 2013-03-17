@@ -13,7 +13,7 @@ $(window).ready(function() {
   var temp_chart = chart("#tempchart", temp_data);
   var last_battery = 0;
 
-  var socket = io.connect('http://device-mothership.herokuapp.com:80/');
+  var socket = io.connect('http://mc-control.herokuapp.com:80/');
 
   socket.on('connect', function() {
     socket.emit('listen-device', $('#device').data('id'));
@@ -40,7 +40,7 @@ $(window).ready(function() {
 
   $('#set-temperature').on('click', function() {
     if ((temp = $('#set-temperature-to').val().replace(/\s/, '')) != '') {
-      $.get('http://device-mothership.herokuapp.com/sensor/' + $('#device').data('id') + '/set/temp/' + temp, function(a,b,c) {
+      $.get('http://mc-control.herokuapp.com/sensor/' + $('#device').data('id') + '/set/temp/' + temp, function(a,b,c) {
         $('#set-temperature-to').val('');
       });
     }
