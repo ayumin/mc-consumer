@@ -100,6 +100,8 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
       get "http://mc-control.herokuapp.com/sensor/#{device}/history/hour", (err, data) ->
         try
           history = JSON.parse(data)
+          history.temp.reverse()
+          history.battery.reverse()
         catch error
           history = {temp:[], battery:[]}
         console.log "history", history
