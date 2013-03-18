@@ -5,7 +5,8 @@ $(window).ready(function() {
   function historical_data(i) {
     var value = parseInt($(h_data[h_data.length - i - 1]).text());
     if (isNaN(value)) { value = 0; }
-    return {time:i, value:value};
+    return value;
+    //return {time:i, value:value};
   }
 
   var temp_data = d3.range(28).map(historical_data)
@@ -19,12 +20,13 @@ $(window).ready(function() {
     socket.emit('listen-device', $('#device').data('id'));
   });
 
-  set_temp(temp_data[temp_data.length-1].value);
+  set_temp(temp_data[temp_data.length-1]);
   set_battery($('#history .battery li:last').text());
 
   socket.on('readings', function(readings) {
     set_battery(readings.battery);
     set_temp(readings.temp);
+    console.log(readings);
   });
 
   $('#broadcast').on('click', function() {
@@ -48,10 +50,7 @@ $(window).ready(function() {
 
   function set_temp(val) {
     $('#device .temp').text(val);
-    temp_data.shift();
-    var new_data = {time: temp_t+=1, value: val};
-    temp_data.push(new_data);
-    temp_chart.redraw(temp_data);
+    temp_chart.push(val);
   }
 
   function set_battery(pct) {
@@ -75,58 +74,73 @@ $(window).ready(function() {
 
 function chart(selector, data) {
   var w = 20,
-      h = 120;
+      h = 120,
+      margin = { left: 35, top: 0 };
 
   var x = d3.scale.linear()
       .domain([0, 1])
       .range([0, w]);
 
   var y = d3.scale.linear()
-      .domain([0, 100])
+      .domain([-15, 50 ])
       .rangeRound([0, h]);
+
+  var y1 = d3.scale.linear()
+      .domain([50, -15])
+      .rangeRound([0, h]);
+
+  var yAxis = d3.svg.axis()
+    .scale(y1)
 
   var chart = d3.select(selector).append("svg")
       .attr("class", "chart")
       .attr("width", w * data.length - 1)
-      .attr("height", h);
+      .attr("height", h)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  chart.selectAll("rect")
-      .data(data)
-    .enter().append("rect")
-      .attr("x", function(d, i) { return x(i) - .5; })
-      .attr("y", function(d) { return h - y(d.value) - .5; })
-      .attr("width", w)
-      .attr("height", function(d) { return y(d.value); });
-
+  // zero point line
   chart.append("line")
       .attr("x1", 0)
       .attr("x2", w * data.length)
-      .attr("y1", h - .5)
-      .attr("y2", h - .5)
+      .attr("y1", y1(0))
+      .attr("y2", y1(0))
       .style("stroke", "#aaa");
 
-  chart.redraw = function (data) {
+  var yAxis = d3.svg.axis()
+    .orient('left')
+    .scale(y1)
+    .tickValues([40,30,20,10, 0, -10])
 
-    var rect = this.selectAll("rect")
-        .data(data, function(d) { return d.time; });
+  //ticks
+   chart.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
 
-    rect.enter().insert("rect", "line")
-        .attr("x", function(d, i) { return x(i + 1) - .5; })
-        .attr("y", function(d) { return h - y(d.value) - .5; })
-        .attr("width", w)
-        .attr("height", function(d) { return y(d.value); })
-      .transition()
-        .duration(1000)
-        .attr("x", function(d, i) { return x(i) - .5; });
+  //line
+  var line = d3.svg.line()
+      .x(function(d,i) { return x(i); })
+      .y(function(d) { return h - y(d); })
 
-    rect.transition()
-        .duration(1000)
-        .attr("x", function(d, i) { return x(i) - .5; });
+  var path = chart.append("g")
+      .attr("clip-path", "url(#clip)")
+    .append("svg:path")
+      .data([data])
+      .attr("d", line)
+      .attr('class', 'line')
 
-    rect.exit()
-      .transition()
-        .duration(1000)
-        .remove();
+  //update transition
+  chart.push = function(v) {
+    data.push(v)
+
+    path
+      .attr("d", line(data))
+      .attr("transform", null)
+    .transition()
+      .ease("linear")
+      .attr("transform", "translate(" + x(-1) + ")");
+
+    data.shift();
   }
 
   return chart;
