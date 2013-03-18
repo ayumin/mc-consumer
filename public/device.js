@@ -58,6 +58,7 @@ $(window).ready(function() {
 
   window.chart = new Highcharts.Chart({
     chart: {
+      height: 200,
       renderTo: 'tempchart',
       type: 'spline',
       marginRight: 10,
