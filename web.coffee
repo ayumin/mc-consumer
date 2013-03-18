@@ -8,6 +8,8 @@ merge    = require("coffee-script").helpers.merge
 passport = require("passport")
 qs       = require("querystring")
 
+mothership_url  = process.env.MOTHERSHIP_URL
+
 delay = (ms, cb) -> setTimeout  cb, ms
 every = (ms, cb) -> setInterval cb, ms
 
@@ -90,14 +92,14 @@ app.get "/", (req, res) ->
   res.render "index.jade", user:{}
 
 app.get "/reset", ensure_authenticated, (req, res) ->
-  del "http://mc-control.herokuapp.com/user/#{req.user.id}/device", "", (err, data) ->
+  del "#{mothership_url}/user/#{req.user.id}/device", "", (err, data) ->
     res.redirect "/dashboard"
 
 app.get "/dashboard", ensure_authenticated, (req, res) ->
-  get "http://mc-control.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+  get "#{mothership_url}/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
     if device
-      get "http://mc-control.herokuapp.com/sensor/#{device}/history/hour", (err, data) ->
+      get "#{mothership_url}/sensor/#{device}/history/hour", (err, data) ->
         try
           history = JSON.parse(data)
           history.temp.reverse()
@@ -110,12 +112,12 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
       res.render "welcome.jade", user:req.user, device:device
 
 app.post "/device", ensure_authenticated, (req, res) ->
-  post "http://mc-control.herokuapp.com/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
+  post "#{mothership_url}/user/#{req.user.id}/device", "device=#{req.body.device}", (err, data) ->
     res.redirect "/dashboard"
 
 app.post "/broadcast", ensure_authenticated, (req, res) ->
   console.log "user", req.user
-  get "http://mc-control.herokuapp.com/user/#{req.user.id}/device", (err, data) ->
+  get "#{mothership_url}/user/#{req.user.id}/device", (err, data) ->
     device = JSON.parse(data)
     message = "Current Temperature: #{req.body.temp}°C\nBattery Level: #{req.body.battery}%"
     post "https://graph.facebook.com/me/feed", qs.stringify(message:message, access_token:req.user.access), (err, data) ->

@@ -1,6 +1,6 @@
 include _header
 
-script(src="/device2.js")
+script(src="/device.js")
 
 style
   #tempchart { min-wdith: 400px; height: 300px; margin: 0 auto; }
@@ -32,8 +32,8 @@ style
 
 ul#history
   .temp
-    each item in history.temp
-      li= item
+    each reading in history.temp
+      li(data-time= reading.t)= reading.v
   .battery
     each item in history.battery
       li= item
