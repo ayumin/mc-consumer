@@ -23,7 +23,7 @@ $(window).ready(function() {
 
   socket.on('readings', function(readings) {
     set_battery(readings.battery);
-    set_temp(readings.temp);
+    set_temp(parseFloat(readings.temp));
     console.log(readings);
   });
 
