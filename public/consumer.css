@@ -59,5 +59,13 @@ ul#history {
 }
 
 #broadcast {
-  margin-top: 6px;
+  margin-top: 9px;
+  background: url(/facebook-share.png);
+  float: right;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 27px;
+  width: 99px;
+  border: 0;
+  cursor: pointer;
 }
