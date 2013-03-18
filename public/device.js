@@ -71,7 +71,7 @@ $(window).ready(function() {
     },
     yAxis: {
       title: {
-        text: 'Value'
+        text: 'Temp (C)'
       },
       plotLines: [{
         value: 0,
