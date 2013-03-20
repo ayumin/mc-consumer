@@ -3,10 +3,9 @@ $(window).ready(function() {
   var h_data = $('#history .temp li')
 
   function historical_data(i) {
-    $node = $(h_data[h_data.length - i - 1])
-    var value = parseInt($node.text());
+    $node = $(h_data[i]) //h_data.length - i - 1])
+    var value = parseInt($node.text()) || 0;
     var time  = $node.attr('data-time')
-    //if (isNaN(value)) { value = 0; }
     return {x:(new Date(time)), y:value};
   }
 
@@ -98,7 +97,7 @@ $(window).ready(function() {
   function set_temp(val, time) {
     $('#device .temp').text(val);
     if(window.chart) {
-      console.log(time, val)
+      //console.log(time, val)
       window.chart.series[0].addPoint({x:time, y:val}, true, true);
     }
   }
@@ -122,7 +121,3 @@ $(window).ready(function() {
   }
 
 });
-
-
-
-

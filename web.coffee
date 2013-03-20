@@ -102,8 +102,8 @@ app.get "/dashboard", ensure_authenticated, (req, res) ->
       get "#{mothership_url}/sensor/#{device}/history/hour", (err, data) ->
         try
           history = JSON.parse(data)
-          history.temp.reverse()
-          history.battery.reverse()
+          history.temp    = history.temp.slice(-21, -1)
+          history.battery = history.battery.slice(-21, -1)
         catch error
           history = {temp:[], battery:[]}
         console.log "history", history
