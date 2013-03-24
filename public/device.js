@@ -30,7 +30,7 @@ $(window).ready(function() {
     console.log(readings);
   });
 
-  $('#broadcast').on('click', function() {
+  $('#facebook-post').on('click', function() {
     var opts = {
       temp: $('#device .temp').text(),
       battery: last_battery
@@ -96,6 +96,7 @@ $(window).ready(function() {
 
   function set_temp(val, time) {
     $('#device .temp').text(val);
+    $('#post-temp').html(val + '&deg;C');
     if(window.chart) {
       //console.log(time, val)
       window.chart.series[0].addPoint({x:time, y:val}, true, true);
@@ -106,6 +107,7 @@ $(window).ready(function() {
     last_battery = pct;
 
     $('#battery-level').css('width', pct + '%');
+    $('#post-battery').text(pct + '%');
 
     $('#battery').removeClass('progress-success');
     $('#battery').removeClass('progress-warning');

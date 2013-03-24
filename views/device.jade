@@ -11,7 +11,7 @@ style
       .current.span6
         h3
           = "Current"
-            img#broadcast
+            a#broadcast(href="#facebook", role="button", data-toggle="modal")
         .row.clearfix
           .temperature
             .clearfix
@@ -37,3 +37,17 @@ ul#history
   .battery
     each item in history.battery
       li= item
+
+.modal.hide.fade#facebook
+  .modal-header
+    button.close(type="button", data-dismiss="modal") &times;
+    h3 Post to Facebook
+  .modal-body
+    = "Current Temperature: "
+    .post-data#post-temp
+    br
+    = "Battery Level: "
+    .post-data#post-battery
+  .modal-footer
+    a.btn(data-dismiss="modal") Close
+    a.btn.btn-primary#facebook-post(data-dismiss="modal") Post to Facebook

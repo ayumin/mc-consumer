@@ -69,3 +69,7 @@ ul#history {
   border: 0;
   cursor: pointer;
 }
+
+.post-data {
+  display: inline-block;
+}
