@@ -1,7 +1,11 @@
 # Machine Cloud Consumer
 
-Example consumer app that allows a user to associate their
-device with their facebook account.
+Example consumer web app with the following features:
+
+* Uses Facebook connect for easy login
+* Allows sharing of device stats to Facebook timeline
+* Set temperature
+* View temperature readings and battery level
 
 ## ENV
 
