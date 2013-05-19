@@ -12,7 +12,7 @@ $(window).ready(function() {
   temp_data = d3.range(20).map(historical_data)
   var last_battery = 0;
 
-  var socket = io.connect('http://mc-control.herokuapp.com:80/');
+  var socket = io.connect(process.env.MOTHERSHIP_URL + ':80/');
   //var socket = io.connect('http://localhost:5100/');
 
   socket.on('connect', function() {
@@ -43,7 +43,7 @@ $(window).ready(function() {
 
   $('#set-temperature').on('click', function() {
     if ((temp = $('#set-temperature-to').val().replace(/\s/, '')) != '') {
-      $.get('http://mc-control.herokuapp.com/sensor/' + $('#device').data('id') + '/set/temp/' + temp, function(a,b,c) {
+      $.get(process.env.MOTHERSHIP_URL + '/sensor/' + $('#device').data('id') + '/set/temp/' + temp, function(a,b,c) {
         $('#set-temperature-to').val('');
       });
     }
