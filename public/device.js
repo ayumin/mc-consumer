@@ -12,6 +12,7 @@ $(window).ready(function() {
   temp_data = d3.range(20).map(historical_data)
   var last_battery = 0;
 
+  io.set("transports", process.env.TRANSPORTS.split(','));
   var socket = io.connect(process.env.MOTHERSHIP_URL + ':80/');
   //var socket = io.connect('http://localhost:5100/');
 
